@@ -1,4 +1,4 @@
-# FROM python:3.10
+# FROM python:3.8.9
 FROM arm64v8/ubuntu:22.04
 
 ENV TZ=Asia/Tokyo
@@ -8,6 +8,13 @@ ENV DEBIAN_FRONTEND=noninteractive
 # # NVIDIA -------------------------------------------------------------
 # ENV NVIDIA_VISIBLE_DEVICES ${NVIDIA_VISIBLE_DEVICES:-all}
 # ENV NVIDIA_DRIVER_CAPABILITIES ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
+
+# install for python
+# Install necessary packages
+RUN apt-get update && \
+    apt-get install -y sudo vim curl git wget python3.10 python3-pip python3.10-venv libgl1-mesa-dev && \
+    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 1
+
 
 # xserver ------------------------------------------------------------
 RUN apt update && apt -y upgrade && \
@@ -25,10 +32,13 @@ RUN pip install \
 opencv-contrib-python==4.5.5.64 \
 # onnxruntime-gpu==1.12.0 \
 onnxruntime>=1.12.0 \
-dearpygui>=1.9.0 \
+# dearpygui==1.9.0 \
 mediapipe>=0.8.10 \
 protobuf>=3.20.0 \
-filterpy>=1.4.5 \
+filterpy>=1.4.5
 
+RUN python3 -m pip install git+https://github.com/hoffstadt/DearPyGui
+
+RUN mkdir /workspace
 WORKDIR /workspace
 CMD ["python3", "main.py"]
